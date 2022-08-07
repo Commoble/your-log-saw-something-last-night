@@ -77,7 +77,6 @@ configurations
 }
 
 repositories {
-	jcenter()
 	mavenCentral()
 	// repo for databuddy
 	maven { url "https://cubicinterpolation.net/maven/" }

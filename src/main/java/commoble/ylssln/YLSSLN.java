@@ -1,19 +1,22 @@
 package commoble.ylssln;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.Locale;
 
 import commoble.databuddy.config.ConfigHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
-import net.minecraftforge.event.world.BlockEvent.BreakEvent;
-import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
+import net.minecraftforge.event.level.BlockEvent.BreakEvent;
+import net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -25,7 +28,6 @@ import net.minecraftforge.network.NetworkConstants;
 public class YLSSLN
 {
 	public static final String MODID = "ylssln";
-	private static final Logger LOGGER = LogManager.getLogger();
 	
 	private final CommonConfig commonConfig;
 	
@@ -44,75 +46,100 @@ public class YLSSLN
 		forgeBus.addListener(this::onBlockBreak);
 		forgeBus.addListener(this::onBlockPlace);
 		forgeBus.addListener(this::onBlockInteract);
+		forgeBus.addListener(this::onItemInteract);
+		forgeBus.addListener(this::onEntityInteractSpecific);
+		forgeBus.addListener(this::onLivingDeath);
 	}
 	
-	private boolean playerShouldBeLogged(ServerPlayer player)
+	private boolean shouldPlayerBeLogged(ServerPlayer player)
 	{
-		if (player instanceof FakePlayer)
-			return false;
-		
-		int permLevel = player.getLevel().getServer().getProfilePermissions(player.getGameProfile());
-		return permLevel >= this.commonConfig.minPermLevel().get() && permLevel <= this.commonConfig.maxPermLevel().get();
+		return !(player instanceof FakePlayer);
 	}
 	
-	private void log(String message)
+	public static String logPos(BlockPos pos)
 	{
-		for (LogRule rule : this.commonConfig.rules().get())
-		{
-			if (rule.regexFilter().map(p->p.asMatchPredicate().test(message)).orElse(true))
-			{
-				LOGGER.log(rule.logLevel(), message);
-				break;
-			}
-		}
+		return String.format(Locale.ENGLISH, "{x=%d,y=%d,z=%d}", pos.getX(), pos.getY(), pos.getZ());
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static String logBlock(Block block)
+	{
+		return block.builtInRegistryHolder().key().location().toString();
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static String logItem(Item item)
+	{
+		return item.builtInRegistryHolder().key().location().toString();
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static String logEntity(Entity entity)
+	{
+		return entity.getType().builtInRegistryHolder().key().location().toString();
 	}
 	
 	private void onBlockBreak(BreakEvent event)
 	{
-		if (Boolean.FALSE.equals(this.commonConfig.logBlockBreak().get()))
-			return;
-		
-		Player player = event.getPlayer();
-		if (player instanceof ServerPlayer serverPlayer && this.playerShouldBeLogged(serverPlayer))
+		if (event.getPlayer() instanceof ServerPlayer serverPlayer && this.shouldPlayerBeLogged(serverPlayer))
 		{
-			BlockPos pos = event.getPos();
-			Block block = event.getState().getBlock();
-			String message = String.format("[ylssln]event=BLOCK_BREAK;player=%s;pos=%s;block=%s",
-				player.getDisplayName().getString(), pos, block);
-			this.log(message);
+			this.commonConfig.blockBreakConfig().get().log(serverPlayer,
+				() -> String.format(Locale.ENGLISH, "[ylssln]event=BLOCK_BREAK;player=%s;pos=%s;block={%s}",
+					serverPlayer.getDisplayName().getString(), logPos(event.getPos()), logBlock(event.getState().getBlock())));
 		}
 	}
 	
 	private void onBlockPlace(EntityPlaceEvent event)
 	{
-		if (Boolean.FALSE.equals(this.commonConfig.logBlockPlace().get()))
-			return;
-		
-		Entity entity = event.getEntity();
-		if (entity instanceof ServerPlayer serverPlayer && this.playerShouldBeLogged(serverPlayer))
+		if (event.getEntity() instanceof ServerPlayer serverPlayer && this.shouldPlayerBeLogged(serverPlayer))
 		{
-			BlockPos pos = event.getPos();
-			Block block = event.getState().getBlock();
-			String message = String.format("[ylssln]event=BLOCK_PLACE;player=%s;pos=%s;block=%s",
-				serverPlayer.getDisplayName().getString(), pos, block);
-			this.log(message);
+			this.commonConfig.blockPlaceConfig().get().log(serverPlayer,
+				() -> String.format(Locale.ENGLISH, "[ylssln]event=BLOCK_PLACE;player=%s;pos=%s;block={%s}",
+					serverPlayer.getDisplayName().getString(), logPos(event.getPos()), logBlock(event.getState().getBlock())));
 		}
 	}
 	
 	private void onBlockInteract(RightClickBlock event)
 	{
-		if (Boolean.FALSE.equals(this.commonConfig.logBlockInteract().get()))
+		if (event.getEntity() instanceof ServerPlayer serverPlayer && this.shouldPlayerBeLogged(serverPlayer))
+		{
+			this.commonConfig.blockInteractConfig().get().log(serverPlayer,
+				() -> String.format(Locale.ENGLISH, "[ylssln]event=BLOCK_INTERACT;player=%s;pos=%s;block={%s};hand=%s;item={%s}",
+					serverPlayer.getDisplayName().getString(), logPos(event.getPos()), logBlock(event.getEntity().getLevel().getBlockState(event.getPos()).getBlock()), event.getHand(), logItem(event.getItemStack().getItem())));
+		}
+	}
+	
+	private void onItemInteract(RightClickItem event)
+	{
+		if (event.getEntity() instanceof ServerPlayer serverPlayer && this.shouldPlayerBeLogged(serverPlayer))
+		{
+			this.commonConfig.itemInteractConfig().get().log(serverPlayer,
+				() -> String.format(Locale.ENGLISH, "[ylssln]event=ITEM_INTERACT;player=%s;pos=%s;item={%s};hand=%s",
+					serverPlayer.getDisplayName().getString(), logPos(event.getPos()), logItem(event.getItemStack().getItem()), event.getHand()));
+		}
+	}
+	
+	private void onEntityInteractSpecific(EntityInteractSpecific event)
+	{
+		if (event.getEntity() instanceof ServerPlayer serverPlayer && this.shouldPlayerBeLogged(serverPlayer))
+		{
+			this.commonConfig.entityInteractConfig().get().log(serverPlayer,
+				() -> String.format(Locale.ENGLISH, "[ylssln]event=ENTITY_INTERACT;player=%s;pos=%s;entity={%s};hand=%s,item={%s}",
+					serverPlayer.getDisplayName().getString(), logPos(event.getPos()), logEntity(event.getTarget()), event.getHand(), logItem(event.getItemStack().getItem())));
+		}
+	}
+	
+	private void onLivingDeath(LivingDeathEvent event)
+	{
+		DamageSource source = event.getSource();
+		if (source == null)
 			return;
 		
-		Player player = event.getPlayer();
-		if (player instanceof ServerPlayer serverPlayer && this.playerShouldBeLogged(serverPlayer))
+		if (source.getEntity() instanceof ServerPlayer serverPlayer && this.shouldPlayerBeLogged(serverPlayer))
 		{
-			BlockPos pos = event.getPos();
-			Block block = event.getEntity().getLevel().getBlockState(pos).getBlock();
-			String message = String.format("[ylssln]event=BLOCK_INTERACT;player=%s;pos=%s;block=%s",
-				serverPlayer.getDisplayName().getString(), pos, block);
-			this.log(message);
+			this.commonConfig.entityKillConfig().get().log(serverPlayer,
+				() -> String.format(Locale.ENGLISH, "[ylssln]event=ENTITY_KILL;player=%s;pos=%s;entity={%s};damageSource=%s",
+					serverPlayer.getDisplayName().getString(), logPos(event.getEntity().blockPosition()), logEntity(event.getEntity()), source.msgId));
 		}
-		
 	}
 }
