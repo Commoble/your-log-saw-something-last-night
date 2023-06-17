@@ -1,3 +1,6 @@
+# 1.1.0.1
+* Update to minecraft 1.20.1
+
 # 1.1.0.0
 * Added logging for players using items on air
 * Added logging for players interacting with entities

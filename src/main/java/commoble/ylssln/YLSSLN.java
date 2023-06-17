@@ -105,7 +105,7 @@ public class YLSSLN
 		{
 			this.commonConfig.blockInteractConfig().get().log(serverPlayer,
 				() -> String.format(Locale.ENGLISH, "[ylssln]event=BLOCK_INTERACT;player=%s;pos=%s;block={%s};hand=%s;item={%s}",
-					serverPlayer.getDisplayName().getString(), logPos(event.getPos()), logBlock(event.getEntity().getLevel().getBlockState(event.getPos()).getBlock()), event.getHand(), logItem(event.getItemStack().getItem())));
+					serverPlayer.getDisplayName().getString(), logPos(event.getPos()), logBlock(event.getEntity().level().getBlockState(event.getPos()).getBlock()), event.getHand(), logItem(event.getItemStack().getItem())));
 		}
 	}
 	
@@ -139,7 +139,7 @@ public class YLSSLN
 		{
 			this.commonConfig.entityKillConfig().get().log(serverPlayer,
 				() -> String.format(Locale.ENGLISH, "[ylssln]event=ENTITY_KILL;player=%s;pos=%s;entity={%s};damageSource=%s",
-					serverPlayer.getDisplayName().getString(), logPos(event.getEntity().blockPosition()), logEntity(event.getEntity()), source.msgId));
+					serverPlayer.getDisplayName().getString(), logPos(event.getEntity().blockPosition()), logEntity(event.getEntity()), source.getMsgId()));
 		}
 	}
 }

@@ -30,7 +30,7 @@ public record LogRule(Level logLevel, Optional<Pattern> regexFilter)
 	{
 		return Optional.ofNullable(Level.valueOf(name.toUpperCase(Locale.ENGLISH)))
 			.map(DataResult::success)
-			.orElseGet(()->DataResult.error("Invalid log level name: " + name));
+			.orElseGet(()->DataResult.error(() -> "Invalid log level name: " + name));
 	}
 	
 	public boolean tryLog(String s)
