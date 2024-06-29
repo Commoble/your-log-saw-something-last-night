@@ -2,6 +2,7 @@ This is a server utility mod for logging player interactions. This mod is curren
 
 Built jars are available here:
 * https://www.curseforge.com/minecraft/mc-mods/your-log-saw-something-last-night
+* https://modrinth.com/mod/your-log-saw-something-last-night
 
 When installed, the following will be logged:
 
