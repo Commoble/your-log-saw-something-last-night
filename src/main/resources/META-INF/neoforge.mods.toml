@@ -1,0 +1,34 @@
+modLoader="javafml" #mandatory
+loaderVersion="[1,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+license="MIT License"
+issueTrackerURL="https://github.com/Commoble/your-log-saw-something-last-night/issues"
+[[mods]] #mandatory
+modId="ylssln" #mandatory
+version="${file.jarVersion}" #mandatory
+displayName="Your Log Saw Something Last Night" #mandatory
+displayURL="https://www.curseforge.com/minecraft/mc-mods/your-log-saw-something-last-night" #optional
+credits="I hear the Minecraft Mod Development discord channel is the cat's bananas" #optional
+authors="Commoble"
+description='''
+Logging utility mod for servers.
+'''
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+[[dependencies.ylssln]] #optional
+    # the modid of the dependency
+    modId="neoforge" #mandatory
+    # Does this dependency have to exist - if not, ordering below must be specified
+    type="required" #mandatory
+    # The version range of the dependency
+    versionRange="[21.0.40-beta,)" #mandatory
+    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
+    ordering="NONE"
+    # Side this dependency is applied on - BOTH, CLIENT or SERVER
+    side="BOTH"
+# Here's another dependency
+[[dependencies.ylssln]]
+    modId="minecraft"
+    type="required"
+# This version range declares a minimum of the current minecraft version up to but not including the next major version
+    versionRange="[1.21, 1.22)"
+    ordering="NONE"
+    side="BOTH"

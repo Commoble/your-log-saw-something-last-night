@@ -2,9 +2,8 @@ package commoble.ylssln;
 
 import java.util.List;
 
-import commoble.databuddy.config.ConfigHelper;
-import commoble.databuddy.config.ConfigHelper.ConfigObject;
-import net.minecraftforge.common.ForgeConfigSpec;
+import commoble.ylssln.ConfigHelper.ConfigObject;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public record CommonConfig(
 	ConfigObject<EventLogger> blockPlaceConfig,
@@ -17,7 +16,7 @@ public record CommonConfig(
 {	
 	public static final List<LogRule> DEFAULT_RULES = List.of(LogRule.defaultRule());
 	
-	public static CommonConfig create(ForgeConfigSpec.Builder builder)
+	public static CommonConfig create(ModConfigSpec.Builder builder)
 	{
 		return new CommonConfig(
 			ConfigHelper.defineObject(builder.comment(

@@ -2,27 +2,23 @@ package commoble.ylssln;
 
 import java.util.Locale;
 
-import commoble.databuddy.config.ConfigHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
-import net.minecraftforge.event.level.BlockEvent.BreakEvent;
-import net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.IExtensionPoint;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.network.NetworkConstants;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem;
+import net.neoforged.neoforge.event.level.BlockEvent.BreakEvent;
+import net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent;
 
 @Mod(YLSSLN.MODID)
 public class YLSSLN
@@ -33,14 +29,10 @@ public class YLSSLN
 	
 	public YLSSLN()
 	{
-		IEventBus forgeBus = MinecraftForge.EVENT_BUS;
-		
-		// mark mod as not required on clients
-		ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
-			() -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (remote, isServer)->true));
+		IEventBus forgeBus = NeoForge.EVENT_BUS;
 		
 		// define configs
-		this.commonConfig = ConfigHelper.register(ModConfig.Type.COMMON, CommonConfig::create);
+		this.commonConfig = ConfigHelper.register(MODID, ModConfig.Type.COMMON, CommonConfig::create);
 		
 		// subscribe events
 		forgeBus.addListener(this::onBlockBreak);

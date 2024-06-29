@@ -1,3 +1,6 @@
+# 2.0.0.0
+* Update to minecraft 1.21 / neoforge 20.0.40-beta
+
 # 1.1.0.1
 * Update to minecraft 1.20.1
 
