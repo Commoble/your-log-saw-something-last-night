@@ -1,8 +1,7 @@
-This is a server utility mod for logging player interactions. This mod is currently available for the Forge modloader.
+This is a server utility mod for logging player interactions. This mod is currently available for the Neoforge modloader.
 
 Built jars are available here:
 * https://www.curseforge.com/minecraft/mc-mods/your-log-saw-something-last-night
-* https://modrinth.com/mod/your-log-saw-something-last-night
 
 When installed, the following will be logged:
 
@@ -13,9 +12,9 @@ When installed, the following will be logged:
 * Entities activated by players
 * Entities killed by players
 
-Interactions by forge's "Fake Players" are not logged.
+Interactions by neoforge's "Fake Players" are not logged.
 
-This mod is configurable to filter logging via regex pattern; the default config file will be generated in yourminecraftinstance/config/ylssln-common.toml by forge the first time minecraft is launched with the mod installed.
+This mod is configurable to filter logging via regex pattern; the default config file will be generated in yourminecraftinstance/config/ylssln-common.toml by neoforge the first time minecraft is launched with the mod installed.
 
 The default config file (with comments included) is as follows:
 
